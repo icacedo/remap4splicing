@@ -31,3 +31,9 @@ rule prefetch:
         "data/{acc}/{acc}.sra"
     shell:
         "prefetch {wildcards.acc} -O {params.outdir}"
+
+# need to play with options
+# get it to produce a consistent number of files
+rule fasterq_dump:
+    input:
+        "data/{acc}/{acc}.sra"
