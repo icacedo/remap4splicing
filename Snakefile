@@ -14,41 +14,35 @@ fastq files are about x7 the size of accession
 fasterq-dump needs temporary space about x1.5 of final fastq files
 space needed during conversion is about x17 the size of the accession
 '''
-#accs = ['SRR5811858', 'SRR5811862']
+#samples = ['SRR5811858', 'SRR5811862']
 
 # test smaller files
-# not paired end, prob better to use actual files
-
-samples = ['SRR23861695', 'SRR23861698']
+# single end RNA-seq
+# single cell blastomere sample from C. elegans
+samples = ['SRR4089683', 'SRR4089651']
 
 rule all:
     input:
-        expand("{sample}_1.fastq", sample=samples),
-        expand("{sample}_2.fastq", sample=samples)
-
-'''
-rule all:
-    input:
-        expand("data/{sample}/{sample}.sra", sample=samples)
-'''
+        expand("fastq/{sample}.fastq", sample=samples)
 
 rule prefetch:
     params:
-        outdir="data/"
+        outdir="sra/"
     output:
-        "data/{sample}/{sample}.sra"
+        directory("sra/{sample}")
     shell:
         "prefetch {wildcards.sample} -O {params.outdir}"
 
-# need to play with options
-# get it to produce a consistent number of files
-
+# if reads are paired-end, will output two fastq files
+# this workflow will only work for single-end reads
 rule fasterq_dump:
+    params:
+        outdir="fastq/"
     input:
-        "data/{acc}"
+        directory("sra/{sample}")
     output:
-        "{acc}_1.fastq",
-        "{acc}_2.fastq"
+        "fastq/{sample}.fastq"
     shell:
-        "fasterq-dump {input}"
+        "fasterq-dump {input} --outdir {params.outdir}"
+
 
