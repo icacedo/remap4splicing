@@ -21,9 +21,16 @@ space needed during conversion is about x17 the size of the accession
 # single cell blastomere sample from C. elegans
 samples = ['SRR4089683', 'SRR4089651']
 
+'''
 rule all:
     input:
         expand("fastq/{sample}.fastq", sample=samples)
+'''
+rule all:
+    input:
+        expand("fastp/{sample}/{sample}_fastp.html", sample=samples),
+        expand("fastp/{sample}/{sample}_fastp.json", sample=samples),
+        expand("fastp/{sample}/{sample}_fastp.fq", sample=samples)
 
 rule prefetch:
     params:
@@ -45,4 +52,22 @@ rule fasterq_dump:
     shell:
         "fasterq-dump {input} --outdir {params.outdir}"
 
+rule fastp:
+    output:
+        fq = "fastp/{sample}/{sample}_fastp.fq",
+        html = "fastp/{sample}/{sample}_fastp.html",
+        json = "fastp/{sample}/{sample}_fastp.json"
+    shell:
+        "fastp -i fastq/{wildcards.sample}.fastq -o {output.fq} "
+        "-h {output.html} -j {output.json}"
 
+'''
+rule fastp:
+    output:
+        fq = "fastp/SRR4089651/fastp.fq",
+        html = "fastp/SRR4089651/fastp.html",
+        json = "fastp/SRR4089651/SRR4089651.json" 
+    shell:
+        "fastp -i fastq/SRR4089651.fastq -o {output.fq} -h {output.html} -j "
+        "{output.json}"
+'''
