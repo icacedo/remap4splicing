@@ -26,11 +26,17 @@ rule all:
     input:
         expand("fastq/{sample}.fastq", sample=samples)
 '''
+'''
 rule all:
     input:
         expand("fastp/{sample}/{sample}_fastp.html", sample=samples),
         expand("fastp/{sample}/{sample}_fastp.json", sample=samples),
         expand("fastp/{sample}/{sample}_fastp.fq", sample=samples)
+'''
+
+rule all:
+    input:
+        expand("sra/{sample}", sample=samples)
 
 rule prefetch:
     params:
@@ -39,7 +45,7 @@ rule prefetch:
         directory("sra/{sample}")
     shell:
         "prefetch {wildcards.sample} -O {params.outdir}"
-
+'''
 # if reads are paired-end, will output two fastq files
 # this workflow will only work for single-end reads
 rule fasterq_dump:
@@ -60,7 +66,7 @@ rule fastp:
     shell:
         "fastp -i fastq/{wildcards.sample}.fastq -o {output.fq} "
         "-h {output.html} -j {output.json}"
-
+'''
 '''
 rule fastp:
     output:
