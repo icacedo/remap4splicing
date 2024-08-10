@@ -40,7 +40,7 @@ for fname in os.listdir('fastq/'):
     c += 1
     if os.path.isfile(f's{c}'): continue
     with open(f's{c}.txt', 'w') as file:
-        file.write(fname)
+        file.write(f'fastq/{fname}')
 
 if not os.path.exists('ind/'):
     os.mkdir('ind/')
@@ -52,26 +52,42 @@ if not os.path.exists('ind/Genome'):
         '--genomeFastaFiles 1pct_elegans.fa'
     ], shell=True)
 
-filesin = ''
+filesin = {}
 fq_files = os.listdir('fastq/')
 for file in fq_files:
-    if file != fq_files[-1]:
-        filesin += f'../fastq/{file},'
-    else:
-        filesin += f'../fastq/{file}'
+    id = file.split('.')[0]
+    filesin[id] = f'../fastq/{file}'
 
-if not os.path.exists('Sout/'):
-    os.mkdir('Sout/')
+for id in filesin:
+    if not os.path.exists(f'Sout_{id}/'):
+        os.mkdir(f'Sout_{id}/')
 
-subprocess.run([
-    f'STAR --runThreadN 15 --genomeDir ../ind/ --readFilesIn {filesin}'
-], cwd='Sout/', shell=True)
+# this step takes a while
+# maybe make the input fastas shorter
+for id in filesin:
+    if not os.path.exists(f'Sout_{id}/Aligned.out.sam'):
+        subprocess.run([
+            f'STAR --runThreadN 15 --genomeDir ../ind/ '
+            f'--readFilesIn {filesin[id]}'
+        ], cwd=f'Sout_{id}/', shell=True)
 
 
-#STAR --runThreadN 2 --genomeDir ind/ --readFilesIn SRR4089683.fastq,SRR4089651.fastq
 
-#samtools view -S -b Aligned.out.sam > Aligned.out.bam
-#samtools sort -o Aligned.out.sorted.bam Aligned.out.bam
+'''
+if not os.path.exists('Aligned.out.sorted.bam'):   
+    subprocess.run([
+        'samtools view -S -b Sout/Aligned.out.sam > Aligned.out.bam &&'
+        'samtools sort -o Aligned.out.sorted.bam Aligned.out.bam'
+    ], shell=True)
+'''
+# gtf file is required for rmats
+# gffread 1pc_elegans.gff3 -T -o- | more > 1.gtf
+# rmats.py --s1 s1.txt --s2 s2.txt --gtf 1.gtf --bi Aligned.out.sorted.bam 
+# --readLength 101 --od rmats_out/ --tmp rmats_tmp/
+# need to create two bam files for each sample group
+# this error comes from STAR
+# rmats is trying to run STAR but can't
+# EXITING because of FATAL ERROR: could not open genome file
 
 # use 2-pass mapping to find novel splice junctions
 # https://www.reneshbedre.com/blog/star-aligner.html
