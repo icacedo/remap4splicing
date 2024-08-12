@@ -49,7 +49,8 @@ if not os.path.exists('ind/'):
 if not os.path.exists('ind/Genome'):
     subprocess.run([
         'STAR --runThreadN 2 --runMode genomeGenerate --genomeDir ind/ '
-        '--genomeFastaFiles 1pct_elegans.fa'
+        #'--genomeFastaFiles 1pct_elegans.fa'
+        '--genomeFastaFiles c_elegans.PRJNA13758.WS282.genomic.fa'
     ], shell=True)
 
 filesin = {}
@@ -71,19 +72,19 @@ for id in filesin:
             f'--readFilesIn {filesin[id]}'
         ], cwd=f'Sout_{id}/', shell=True)
 
+for id in filesin:
+    if not os.path.exists(f'Sout_{id}/Aligned.out.sorted.bam'):
+        subprocess.run([
+            'samtools view -S -b Aligned.out.sam > Aligned.out.bam &&'
+            'samtools sort -o Aligned.out.sorted.bam Aligned.out.bam'
+        ], cwd=f'Sout_{id}', shell=True)
 
-
-'''
-if not os.path.exists('Aligned.out.sorted.bam'):   
-    subprocess.run([
-        'samtools view -S -b Sout/Aligned.out.sam > Aligned.out.bam &&'
-        'samtools sort -o Aligned.out.sorted.bam Aligned.out.bam'
-    ], shell=True)
-'''
 # gtf file is required for rmats
 # gffread 1pc_elegans.gff3 -T -o- | more > 1.gtf
-# rmats.py --s1 s1.txt --s2 s2.txt --gtf 1.gtf --bi Aligned.out.sorted.bam 
+
+# rmats.py --s1 s1.txt --s2 s2.txt --gtf 1.gtf --bi ind/ 
 # --readLength 101 --od rmats_out/ --tmp rmats_tmp/
+
 # need to create two bam files for each sample group
 # this error comes from STAR
 # rmats is trying to run STAR but can't
@@ -94,9 +95,12 @@ if not os.path.exists('Aligned.out.sorted.bam'):
 # need gtf from gff
 # https://github.com/NBISweden/AGAT
 
+# make bam.txt files for rmats
 
-
-
+# rmats did not find any hits with the 1 pct genome
+# try full length
+# wget PRJNA13758 WS282 genomic.fa.gz
+# wget PRJNA13758 WS282 annotations.gff3.gz
 
 
 
