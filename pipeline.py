@@ -82,8 +82,16 @@ for id in filesin:
 # gtf file is required for rmats
 # gffread 1pc_elegans.gff3 -T -o- | more > 1.gtf
 
-# rmats.py --s1 s1.txt --s2 s2.txt --gtf 1.gtf --bi ind/ 
+# rmats.py --s1 s1.txt --s2 s2.txt --gtf 1.gtf --bi ind/ -t single
 # --readLength 101 --od rmats_out/ --tmp rmats_tmp/
+# --nthread
+# --novelSS to find novel splice sites, default is off
+# consider setting --anchorLength, default is 1 which is probably 
+# way to low
+# need to specify to run stats with
+# --task stat
+
+# can i create bam files from long read sequencing data and use that in rmats?
 
 # need to create two bam files for each sample group
 # this error comes from STAR
