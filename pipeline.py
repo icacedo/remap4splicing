@@ -12,6 +12,7 @@ Work on RNA-seq pipeline without snakemake first
 Translate to Snakemake later
 '''
 
+
 import subprocess
 import os
 
