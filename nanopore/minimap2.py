@@ -6,6 +6,9 @@ accession number PRJEB31791
 for testing, get fastq from run ERR3245465
 '''
 
+# how to minimap2
+# https://github.com/lh3/minimap2
+
 import subprocess
 import os
 
