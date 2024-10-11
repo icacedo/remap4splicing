@@ -2,25 +2,16 @@ import sys
 
 sam = sys.argv[1]
 
-def is_num(s):
-
-    try:
-        return int(s)
-    except ValueError:
-        return None
-
+flag_counts = {}
 with open(sam, 'r') as fp:
     for line in fp.readlines():
-        line = line.rstrip()
         if line.startswith('@'): continue
-        line = line.split('\t')
-        cigar = line[5]
-        seq = line[9]
-        total = 0
-        for s in cigar:
-            val = is_num(s)
-            if isinstance(val, int) == True:
-                total += val
-        print(total)
-        print(len(seq))
-        break
+        line = line.rstrip()
+        line = line.split()
+        if line[1] not in flag_counts:
+            flag_counts[line[1]] = 1
+        else:
+            flag_counts[line[1]] += 1
+        if line[1] == '272':
+            print(line)
+print(flag_counts)
