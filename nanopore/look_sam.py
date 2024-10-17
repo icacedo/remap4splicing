@@ -12,6 +12,6 @@ with open(sam, 'r') as fp:
             flag_counts[line[1]] = 1
         else:
             flag_counts[line[1]] += 1
-        if line[1] == '272':
-            print(line)
+        #if line[1] == '272':
+            #print(line)
 print(flag_counts)
