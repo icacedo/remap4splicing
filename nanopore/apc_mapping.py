@@ -1,8 +1,10 @@
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument('txt')
+parser.add_argument('apc_dir')
 
 args = parser.parse_args()
 
@@ -45,8 +47,30 @@ with open(args.txt) as fp:
             slen = len(line[9])
             mapped[rid] = [int(pos), slen]
 
-for i in mapped:
-    print(i, mapped[i])
+#for i in mapped:
+#    print(i, mapped[i])
+
+genes = {}
+for item in os.listdir(args.apc_dir):
+    if item.endswith('fa'):
+        with open(f'{args.apc_dir}{item}') as fp:
+            gid = ''
+            seq = ''
+            for line in fp.readlines():
+                line = line.rstrip()
+                if line.startswith('>'):
+                    gid = line
+                else:
+                    seq += line
+            genes[gid] = seq
+
+#print(genes)
+
+# if reads overlap with at least one base: assign to gene
+# find a way to put this into jbrowse
+
+# II:3243554-3244269
+#
 
 
 
