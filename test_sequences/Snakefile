@@ -10,8 +10,8 @@ samples = ["ERR13244179"]
 
 rule all:
     input:
-        expand("fastq/small.{sample}_{r}.fastq", sample=samples, r=[1, 2]),
-        "indices/"
+        expand("fastq/1pct.{sample}_{r}.fastq", sample=samples, r=[1, 2]),
+        "aln.sam"
         #expand("sra/{sample}", sample=samples)
 
 rule prefetch:
@@ -28,11 +28,12 @@ rule fasterq_dump:
     input:
         "sra/{sample}"
     output:
-        directory("fastq/small.{sample}_{r}.fastq")
+        directory("fastq/1pct.{sample}_{r}.fastq")
     shell:
         "fasterq-dump {input} --outdir {params.outdir}"
 
 # maybe need to write something that verifies all reads are the same length?
+'''
 r_len = 0
 for file in os.listdir("fastq/"):
     command = f"head -n 1 fastq/{file} | awk '{{print $3}}'"
@@ -60,6 +61,28 @@ rule STAR_index:
 
 # use this to make smaller fastq files for testing
 # lines=$(cat fastq/ERR13244179_1.fastq | wc -l) && cat fastq/ERR13244179_1.fastq | head -n $((((lines / 4) / 10000) * 4)) > fastq/small.ERR13244179_1.fastq
-
+'''
 # i'm going to switch to using minimap2
 # it seems to not neet the index making step or gtfs like STAR
+# minimap2 is so much quicker than STAR
+# let's try 1 percent again
+
+# -a generates CIGAR and SAM as output
+# -x allows multiple options, lke sr
+# sr for short single end reads without splicing
+
+# i just read that minimap2 does not work well with short spliced reads
+# Next look at HISAT2, which has spliced alignment options
+# https://www.reneshbedre.com/blog/hisat2-sequence-aligner.html
+
+rule minimap2:
+    input:
+        expand("fastq/1pct.{sample}_{r}.fastq", sample=samples, r=[1, 2])
+    output:
+        "aln.sam"
+    shell:
+        """
+        minimap2 -ax sr 
+        """
+
+
