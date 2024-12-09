@@ -8,10 +8,13 @@ else:
 
 samples = ["ERR13244179"]
 
+# takes forever to download from database
+# use pre loaded files for testing
+'''
 rule all:
     input:
         expand("fastq/1pct.{sample}_{r}.fastq", sample=samples, r=[1, 2]),
-        "aln.sam"
+        #expand("1pct.{n}.ht2", n=[1, 2, 3, 4, 5, 6, 7, 8])
         #expand("sra/{sample}", sample=samples)
 
 rule prefetch:
@@ -31,6 +34,11 @@ rule fasterq_dump:
         directory("fastq/1pct.{sample}_{r}.fastq")
     shell:
         "fasterq-dump {input} --outdir {params.outdir}"
+'''
+
+
+
+
 
 # maybe need to write something that verifies all reads are the same length?
 '''
@@ -75,14 +83,16 @@ rule STAR_index:
 # Next look at HISAT2, which has spliced alignment options
 # https://www.reneshbedre.com/blog/hisat2-sequence-aligner.html
 
-rule minimap2:
+# use hisat2-build to index reference genome
+
+# use --config on command line or build a config file for initial inputs
+
+rule index:
     input:
-        expand("fastq/1pct.{sample}_{r}.fastq", sample=samples, r=[1, 2])
+        "genome/1pct_elegans.fa"
     output:
-        "aln.sam"
+        "1pct.{n}.ht2"
     shell:
-        """
-        minimap2 -ax sr 
-        """
+        "hisat2-build -f {input} 1pct"
 
 
