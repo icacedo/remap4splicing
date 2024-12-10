@@ -36,10 +36,6 @@ rule fasterq_dump:
         "fasterq-dump {input} --outdir {params.outdir}"
 '''
 
-
-
-
-
 # maybe need to write something that verifies all reads are the same length?
 '''
 r_len = 0
@@ -89,24 +85,34 @@ rule STAR_index:
 
 rule all:
     input:
-        expand("1pct.{n}.ht2", n=[1, 2, 3, 4, 5, 6, 7, 8]),
-        "test.sam"
+        expand("index/1pct.{n}.ht2", n=[1, 2, 3, 4, 5, 6, 7, 8]),
+        expand("{sample}.sam", sample=samples),
+        expand("{sample}.log", sample=samples)
 
 rule index:
     input:
         "genome/1pct_elegans.fa"
+    params:
+        prefix="index/1pct"
     output:
-        "1pct.{n}.ht2"
+        "index/1pct.{n}.ht2"
     shell:
-        "hisat2-build -f {input} 1pct"
+        "hisat2-build -f {input} {params.prefix}"
 
 rule align:
     input:
         r1=expand("small_fastq/0.1pct.{sample}_1.fastq.gz", sample=samples),
         r2=expand("small_fastq/0.1pct.{sample}_2.fastq.gz", sample=samples)
     output:
-        "test.sam"
+        log="{sample}.log",
+        sam="{sample}.sam"
+    # output of alignment can be sent directly to stdout
+    # you can define extra flags as params
     shell:
-        "hisat2 -x 1pct -1 {input.r1} -2 {input.r2} -S {output} 2> log.out"
+        'hisat2 -x index/1pct -1 {input.r1} -2 {input.r2} > {output.sam} '
+        '2> {output.log}'
+
+# next need to write a script that gets only aligned reads from the sam file
+        
  
 
