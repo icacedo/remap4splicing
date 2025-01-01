@@ -12,7 +12,7 @@ else:
 
 rule index:
     input:
-        "../../test_sequences/genome/1pct_elegans.fa"
+        "../test_sequences/genome/1pct_elegans.fa"
     shell:
         """
         STAR --runThreadN {cores} --runMode genomeGenerate --genomeDir gen/ \
