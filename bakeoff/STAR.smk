@@ -13,8 +13,16 @@ else:
 rule index:
     input:
         "../test_sequences/genome/1pct_elegans.fa"
+    output:
+        directory("gen/")
     shell:
         """
-        STAR --runThreadN {cores} --runMode genomeGenerate --genomeDir gen/ \
+        STAR --runThreadN {cores} --runMode genomeGenerate --genomeDir {output} \
         --genomeFastaFiles {input} 
         """
+
+# STAR isn't using multiple threads when specified?
+rule align:
+    input:
+        directory("gen/")
+    output:
